@@ -54,16 +54,34 @@ public class Tourao extends AdvancedRobot {
 
     public void onHitWall(HitWallEvent e) {
         moveDirection *= -1;
-        setAhead(100 * moveDirection);
+        double centroX = getBattleFieldWidth() / 2;
+        double centroY = getBattleFieldHeight() / 2;
+        double anguloCentro = Math.toDegrees(Math.atan2(centroX - getX(), centroY - getY()));
+        setTurnRight(Utils.normalRelativeAngleDegrees(anguloCentro - getHeading()));
+        setAhead(100);
     }
 
     private void doMovement() {
-        if (currentTarget != null) {
-            setTurnRight(currentTarget.bearing + 90 - (15 * moveDirection));
-            setAhead(100 * moveDirection);
+        double margem = 60;
+        boolean pertoParede = 
+            (getX() < margem || getX() > getBattleFieldWidth() - margem ||
+             getY() < margem || getY() > getBattleFieldHeight() - margem);
+
+        if (pertoParede) {
+            moveDirection *= -1;
+            double centroX = getBattleFieldWidth() / 2;
+            double centroY = getBattleFieldHeight() / 2;
+            double anguloCentro = Math.toDegrees(Math.atan2(centroX - getX(), centroY - getY()));
+            setTurnRight(Utils.normalRelativeAngleDegrees(anguloCentro - getHeading()));
+            setAhead(100);
         } else {
-            setTurnRight(10);
-            setAhead(50);
+            if (currentTarget != null) {
+                setTurnRight(currentTarget.bearing + 90 - (15 * moveDirection));
+                setAhead(100 * moveDirection);
+            } else {
+                setTurnRight(10);
+                setAhead(50);
+            }
         }
     }
 
